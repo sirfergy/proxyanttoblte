@@ -1,0 +1,30 @@
+{
+  "name": "proxyanttoblte",
+  "version": "0.0.1",
+  "description": "Proxy ANT+ sensors to BTLE equivalents",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "main": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirfergy/proxyanttoblte.git"
+  },
+  "keywords": [
+    "ant",
+    "garmin",
+    "btle"
+  ],
+  "author": "sirfergy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sirfergy/proxyanttoblte/issues"
+  },
+  "homepage": "https://github.com/sirfergy/proxyanttoblte#readme",
+  "dependencies": {
+    "ant-plus-next": "^0.3.2",
+    "zwack": "^0.1.8"
+  }
+}
