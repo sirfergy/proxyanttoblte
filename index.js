@@ -70,7 +70,7 @@ if (ble) {
         }
     });
 
-    setTimeout(() => bleno.startAdvertising('RSC', [RSC_SERVICE_UUID]), 5000);
+    // setTimeout(() => bleno.startAdvertising('RSC', [RSC_SERVICE_UUID]), 5000);
 }
 
 const ant = false;
