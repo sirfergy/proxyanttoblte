@@ -29,6 +29,7 @@ if (ble) {
         }
 
         sendMeasurement() {
+            console.log("Sending measurement");
             if (this._updateValueCallback) {
                 // Example RSC measurement data
                 const buffer = Buffer.alloc(10);
@@ -47,6 +48,7 @@ if (ble) {
     }
 
     bleno.on('stateChange', (state) => {
+        console.log("State change " + state);
         if (state === 'poweredOn') {
             bleno.startAdvertising('RSC', [RSC_SERVICE_UUID]);
         } else {
@@ -55,6 +57,7 @@ if (ble) {
     });
 
     bleno.on('advertisingStart', (error) => {
+        console.log("Advertising start " + error);
         if (!error) {
             bleno.setServices([
                 new bleno.PrimaryService({
