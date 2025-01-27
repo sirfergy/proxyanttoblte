@@ -1,6 +1,5 @@
 import { GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
-//import ZwackBLE from 'zwack';
 
 const ble = true;
 if (ble) {
@@ -14,6 +13,12 @@ if (ble) {
                 uuid: RSC_MEASUREMENT_CHARACTERISTIC_UUID,
                 properties: ['notify'],
                 value: null,
+                descriptors: [
+                    new bleno.Descriptor({
+                        uuid: '2901',
+                        value: 'Running Speed And Cadence'
+                    }),
+                ]
             });
         }
 
@@ -69,8 +74,6 @@ if (ble) {
             ]);
         }
     });
-
-    // setTimeout(() => bleno.startAdvertising('RSC', [RSC_SERVICE_UUID]), 5000);
 }
 
 const ant = false;
