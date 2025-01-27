@@ -76,23 +76,13 @@ if (ble) {
     });
 }
 
-const ant = false;
-if (ant) {
+const ant_read = false;
+if (ant_read) {
     const stick = new GarminStick2();
-    /*const zwack = new ZwackBLE({
-        name: 'Zwack',
-        modelNumber: 'ZW-101',
-        serialNumber: '1'
-    });*/
 
     const running = new StrideSpeedDistanceSensor(stick);
     running.on('ssdData', data => {
         console.log(JSON.stringify(data));
-
-        /*zwack.notifyRSC({
-            speed: data.speed,
-            cadence: data.cadence,
-        });*/
     });
 
     stick.on('startup', () => {
@@ -101,6 +91,75 @@ if (ant) {
 
     const result = await stick.open();
     console.log('Stick open result:', result);
+
+    process.on('SIGINT', () => {
+        console.log('Caught interrupt signal (Ctrl+C)');
+        stick.close();
+        // Perform any cleanup or shutdown tasks here
+        process.exit();
+    });
+}
+
+const ant_rsc = true;
+if (ant_rsc) {
+    const DEVICE_TYPE = 124; // SSD Sensor
+
+    const stick = new Ant.GarminStick2();
+
+    if (!stick.open()) {
+        console.error('ANT+ stick not found!');
+        process.exit();
+    }
+
+    const channel = new Ant.Channel(stick);
+
+    function getStrideData() {
+        const speed = 3.5; // meters per second
+        const distance = 1000; // meters
+        const strides = 150; // number of strides
+        return { speed, distance, strides };
+    }
+
+    function broadcastStrideData() {
+        const { speed, distance, strides } = getStrideData();
+
+        const speedData = Math.round(speed * 256); // speed in 1/256th m/s
+        const distanceData = Math.round(distance * 16); // distance in 1/16th m
+        const stridesData = strides; // number of strides
+
+        const data = [
+            speedData & 0xFF, (speedData >> 8) & 0xFF,
+            distanceData & 0xFF, (distanceData >> 8) & 0xFF,
+            stridesData & 0xFF, (stridesData >> 8) & 0xFF,
+            0, 0 // Reserved bytes
+        ];
+
+        channel.sendBroadcastData(data);
+    }
+
+    stick.on('startup', function () {
+        console.log('ANT+ stick is ready.');
+
+        channel.setChannelType('transmit');
+        channel.setDeviceType(DEVICE_TYPE);
+        channel.setTransmitPower(4);
+        channel.setChannelPeriod(8192);
+        channel.setRfFrequency(57);
+        channel.setSearchTimeout(0);
+
+        channel.open();
+
+        channel.on('broadcast', function (data) {
+            console.log('Broadcasting:', data);
+        });
+
+        // Broadcast stride data every second
+        setInterval(broadcastStrideData, 1000);
+    });
+
+    stick.on('error', function (err) {
+        console.error('Error:', err);
+    });
 
     process.on('SIGINT', () => {
         console.log('Caught interrupt signal (Ctrl+C)');
