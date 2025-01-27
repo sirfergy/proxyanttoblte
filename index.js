@@ -1,7 +1,7 @@
-import { GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
+import { Channel, GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
 
-const ble = true;
+const ble = false;
 if (ble) {
     // Define UUIDs for the RSC service and characteristics
     const RSC_SERVICE_UUID = '1814';
@@ -104,14 +104,14 @@ const ant_rsc = true;
 if (ant_rsc) {
     const DEVICE_TYPE = 124; // SSD Sensor
 
-    const stick = new Ant.GarminStick2();
+    const stick = new GarminStick2();
 
     if (!stick.open()) {
         console.error('ANT+ stick not found!');
         process.exit();
     }
 
-    const channel = new Ant.Channel(stick);
+    const channel = new Channel(stick);
 
     function getStrideData() {
         const speed = 3.5; // meters per second
