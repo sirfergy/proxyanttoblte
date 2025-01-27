@@ -1,4 +1,4 @@
-import { Channel, GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
+import { Messages, GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
 
 const ble = false;
@@ -111,8 +111,6 @@ if (ant_rsc) {
         process.exit();
     }
 
-    const channel = new Channel(stick);
-
     function getStrideData() {
         const speed = 3.5; // meters per second
         const distance = 1000; // meters
@@ -134,24 +132,21 @@ if (ant_rsc) {
             0, 0 // Reserved bytes
         ];
 
-        channel.sendBroadcastData(data);
+        //const data = Buffer.alloc(8);
+        //data.writeUInt16LE(speedData, 0);
+        //data.writeUInt16LE(distanceData, 2);
+        //data.writeUInt16LE(stridesData, 4);
+
+        // const message = Buffer.concat([Buffer.from([0xA4, 0x09, 0x4E, 0x00]), data, Buffer.from([0xEF])]);
+        
+        const message = Messages.buildMessage(data);
+
+        Messages.broadcastData(0, message);
+
     }
 
     stick.on('startup', function () {
         console.log('ANT+ stick is ready.');
-
-        channel.setChannelType('transmit');
-        channel.setDeviceType(DEVICE_TYPE);
-        channel.setTransmitPower(4);
-        channel.setChannelPeriod(8192);
-        channel.setRfFrequency(57);
-        channel.setSearchTimeout(0);
-
-        channel.open();
-
-        channel.on('broadcast', function (data) {
-            console.log('Broadcasting:', data);
-        });
 
         // Broadcast stride data every second
         setInterval(broadcastStrideData, 1000);
