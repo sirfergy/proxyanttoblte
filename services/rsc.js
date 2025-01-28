@@ -70,7 +70,7 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
         }
 
         // Send measurement every second
-        setTimeout(this.sendMeasurement.bind(this), 1000);
+        // setTimeout(this.sendMeasurement.bind(this), 1000);
     }
 }
 
@@ -111,21 +111,27 @@ class SCControlPointCharacteristic extends bleno.Characteristic {
 }
 
 class RSCService extends bleno.PrimaryService {
+    measurement = null;
+
     constructor() {
+        this.measurement = new RSCMeasurementCharacteristic();
         super({
             uuid: RSC_SERVICE_UUID,
             characteristics: [
-                new RSCMeasurementCharacteristic(),
+                this.measurement,
                 new RSCFeatureCharacteristic(),
                 new SensorLocationCharacteristic(),
                 new SCControlPointCharacteristic()
             ]
         });
     }
+
+    notify() {
+        console.log("Notified!");
+        this.measurement.sendMeasurement();
+    }
 }
 
 export {
     RSCService, RSC_SERVICE_UUID
 };
-
-//export default RSCService;
