@@ -1,7 +1,7 @@
 import { Messages, GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
 
-const ble = false;
+const ble = true;
 if (ble) {
     // Define UUIDs for the RSC service and characteristics
     const RSC_SERVICE_UUID = '1814';
@@ -100,7 +100,7 @@ if (ant_read) {
     });
 }
 
-const ant_rsc = true;
+const ant_rsc = false;
 if (ant_rsc) {
     const DEVICE_TYPE = 124; // SSD Sensor
 
