@@ -124,4 +124,8 @@ class RSCService extends bleno.PrimaryService {
     }
 }
 
-export default RSCService;
+export {
+    RSCService, RSC_SERVICE_UUID
+};
+
+//export default RSCService;
