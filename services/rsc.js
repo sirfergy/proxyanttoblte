@@ -114,16 +114,17 @@ class RSCService extends bleno.PrimaryService {
     measurement = null;
 
     constructor() {
-        this.measurement = new RSCMeasurementCharacteristic();
+        const measurement = new RSCMeasurementCharacteristic();
         super({
             uuid: RSC_SERVICE_UUID,
             characteristics: [
-                this.measurement,
+                measurement,
                 new RSCFeatureCharacteristic(),
                 new SensorLocationCharacteristic(),
                 new SCControlPointCharacteristic()
             ]
         });
+        this.measurement = measurement;
     }
 
     notify() {
