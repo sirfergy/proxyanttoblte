@@ -1,5 +1,7 @@
 import { Messages, GarminStick2, StrideSpeedDistanceSensor } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
+import RSCService from "./services/rsc.js";
+import DeviceInformationService from "./services/dis.js";
 
 const ble = true;
 if (ble) {
@@ -172,26 +174,8 @@ if (ble) {
         console.log("Advertising start " + error);
         if (!error) {
             bleno.setServices([
-                new bleno.PrimaryService({
-                    uuid: RSC_SERVICE_UUID,
-                    characteristics: [
-                        new RSCFeatureCharacteristic(),
-                        new RSCMeasurementCharacteristic(),
-                        new SensorLocationCharacteristic(),
-                        new SCControlPointCharacteristic(),
-                    ],
-                }),
-                new bleno.PrimaryService({
-                    uuid: DIS_SERVICE_UUID,
-                    characteristics: [
-                        manufacturerName,
-                        modelNumber,
-                        serialNumber,
-                        hardwareRevision,
-                        firmwareRevision,
-                        softwareRevision
-                    ]
-                }),
+                new RSCService(),
+                new DeviceInformationService(),
             ]);
         }
     });
