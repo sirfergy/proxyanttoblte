@@ -142,7 +142,6 @@ if (ant_rsc) {
         const message = Messages.buildMessage(data);
 
         Messages.broadcastData(0, message);
-
     }
 
     stick.on('startup', function () {
