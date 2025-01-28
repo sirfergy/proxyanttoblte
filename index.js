@@ -105,6 +105,7 @@ if (ble) {
                 // Example RSC measurement data
                 const buffer = Buffer.alloc(10);
 
+                let flags = 0;
                 flags |= 0x01; // Instantaneous Stride Length Present
                 flags |= 0x02; // Instantaneous Cadence Present
 
