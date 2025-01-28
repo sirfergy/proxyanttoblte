@@ -44,7 +44,7 @@ const softwareRevision = new bleno.Characteristic({
     value: Buffer.from('SW1.0')
 });
 
-class DeviceInformationService extends bleno.PrimaryService {
+export class DeviceInformationService extends bleno.PrimaryService {
     constructor() {
         super({
             uuid: DIS_SERVICE_UUID,
@@ -59,5 +59,3 @@ class DeviceInformationService extends bleno.PrimaryService {
         });
     }
 }
-
-export default DeviceInformationService;
