@@ -110,7 +110,7 @@ class SCControlPointCharacteristic extends bleno.Characteristic {
     }
 }
 
-export class RSCService extends bleno.PrimaryService {
+class RSCService extends bleno.PrimaryService {
     constructor() {
         super({
             uuid: RSC_SERVICE_UUID,
@@ -123,3 +123,5 @@ export class RSCService extends bleno.PrimaryService {
         });
     }
 }
+
+export default RSCService;
