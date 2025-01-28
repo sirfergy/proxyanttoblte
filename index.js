@@ -3,6 +3,15 @@ import bleno from "@abandonware/bleno";
 
 const ble = true;
 if (ble) {
+    // UUIDs for the Device Information Service and characteristics
+    const DIS_SERVICE_UUID = '180A';
+    const MANUFACTURER_NAME_CHAR_UUID = '2A29';
+    const MODEL_NUMBER_CHAR_UUID = '2A24';
+    const SERIAL_NUMBER_CHAR_UUID = '2A25';
+    const HARDWARE_REVISION_CHAR_UUID = '2A27';
+    const FIRMWARE_REVISION_CHAR_UUID = '2A26';
+    const SOFTWARE_REVISION_CHAR_UUID = '2A28';
+
     // Device Information Service Characteristics
     const manufacturerName = new bleno.Characteristic({
         uuid: MANUFACTURER_NAME_CHAR_UUID,
