@@ -15,7 +15,4 @@
         "node_modules",
         "dist"
     ],
-    "extensionsToTreatAsEsm": [
-        ".ts"
-    ],
 }

@@ -1,7 +1,6 @@
 import bleno from "@abandonware/bleno";
 
-// Define UUIDs for the RSC service and characteristics
-export const RSC_SERVICE_UUID = '1814';
+const RSC_SERVICE_UUID = '1814';
 const RSC_FEATURE_CHARACTERISTIC_UUID = '2A54';
 const RSC_MEASUREMENT_CHARACTERISTIC_UUID = '2A53';
 const SENSOR_LOCATION_CHARACTERISTIC_UUID = '2A5D';
@@ -46,7 +45,7 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
     onSubscribe(maxValueSize: number, updateValueCallback: UpdateValueCallback) {
         console.log('RSC Measurement subscribed');
         this._updateValueCallback = updateValueCallback;
-        this.sendMeasurement();
+        // this.sendMeasurement();
     }
 
     onUnsubscribe() {
@@ -54,7 +53,7 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
         this._updateValueCallback = null;
     }
 
-    sendMeasurement() {
+    sendMeasurement(speedMetersPerSecond: number, cadenceStepsPerMinute: number, strideLengthInMeters: number, totalDistanceInKilometers: number) {
         console.log("Sending measurement");
         if (this._updateValueCallback) {
             // Example RSC measurement data
@@ -65,10 +64,16 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
             flags |= 0x02; // Instantaneous Cadence Present
 
             buffer.writeUInt8(flags, 0);
-            buffer.writeUInt16LE(150, 1); // Instantaneous Speed (1.5 m/s)
-            buffer.writeUInt8(60, 3); // Instantaneous Cadence (60 steps/min)
-            buffer.writeUInt16LE(100, 4); // Instantaneous Stride Length (1.0 m)
-            buffer.writeUInt32LE(5000, 6); // Total Distance (5.0 km)
+
+            buffer.writeUInt16LE(speedMetersPerSecond * 100, 1); // Instantaneous Speed
+            buffer.writeUInt8(cadenceStepsPerMinute, 3); // Instantaneous Cadence 
+            buffer.writeUInt16LE(strideLengthInMeters * 100, 4); // Instantaneous Stride Length
+            buffer.writeUInt32LE(totalDistanceInKilometers * 1000, 6); // Total Distance
+
+            //buffer.writeUInt16LE(150, 1); // Instantaneous Speed (1.5 m/s)
+            //buffer.writeUInt8(60, 3); // Instantaneous Cadence (60 steps/min)
+            //buffer.writeUInt16LE(100, 4); // Instantaneous Stride Length (1.0 m)
+            //buffer.writeUInt32LE(5000, 6); // Total Distance (5.0 km)
 
             this._updateValueCallback(buffer);
         }
@@ -89,7 +94,7 @@ class SensorLocationCharacteristic extends bleno.Characteristic {
         this.value = Buffer.from([sensorLocation]);
     }
 
-    onReadRequest(offset: any, callback: (offset: number, callback?: Buffer) => void) {
+    onReadRequest(offset: number, callback: (offset: number, callback?: Buffer) => void) {
         console.log('SensorLocationCharacteristic - onReadRequest');
         callback(this.RESULT_SUCCESS, this.value);
     }
@@ -104,7 +109,7 @@ class SCControlPointCharacteristic extends bleno.Characteristic {
         });
     }
 
-    onWriteRequest(data: any, offset: any, withoutResponse: any, callback: (arg0: number) => void) {
+    onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (arg0: number) => void) {
         console.log('SCControlPointCharacteristic - onWriteRequest:', data);
 
         // Handle the data written to the control point
@@ -131,8 +136,8 @@ export class RSCService extends bleno.PrimaryService {
         this.measurement = measurement;
     }
 
-    notify() {
+    notify(speedMetersPerSecond: number, cadenceStepsPerMinute: number, strideLengthInMeters: number, totalDistanceInKilometers: number) {
         console.log("Notified!");
-        this.measurement.sendMeasurement();
+        this.measurement.sendMeasurement(speedMetersPerSecond, cadenceStepsPerMinute, strideLengthInMeters, totalDistanceInKilometers);
     }
 }
