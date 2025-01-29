@@ -19,7 +19,7 @@ class RSCFeatureCharacteristic extends bleno.Characteristic {
 
     onReadRequest(offset: number, callback: (offset: number, callback?: Buffer) => void) {
         console.log('RSCFeatureCharacteristic - onReadRequest');
-        callback(this.RESULT_SUCCESS, this.value);
+        callback(this.RESULT_SUCCESS, this.value ?? undefined);
     }
 }
 
@@ -96,7 +96,7 @@ class SensorLocationCharacteristic extends bleno.Characteristic {
 
     onReadRequest(offset: number, callback: (offset: number, callback?: Buffer) => void) {
         console.log('SensorLocationCharacteristic - onReadRequest');
-        callback(this.RESULT_SUCCESS, this.value);
+        callback(this.RESULT_SUCCESS, this.value ?? undefined);
     }
 }
 
