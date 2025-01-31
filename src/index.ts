@@ -1,8 +1,9 @@
 import { GarminStick2, StrideSpeedDistanceSensor, StrideSpeedDistanceSensorState } from 'ant-plus-next';
 import bleno from "@abandonware/bleno";
-import noble from "@abandonware/noble";
+import { Peripheral } from "@abandonware/noble";
 import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
+const noble = require('@abandonware/noble/with-custom-binding')({ extended: true });
 
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
@@ -73,10 +74,10 @@ if (ftms_read) {
         force: 1 << 12
     };
 
-    noble.on('stateChange', (state) => {
+    noble.on('stateChange', (state: string) => {
         console.log(`State change: ${state}`);
         if (state == "poweredOn") {
-            noble.startScanning(["1826"], true, (error) => {
+            noble.startScanning(["1826"], true, (error: Error) => {
                 if (error) {
                     console.error(error);
                 }
@@ -85,7 +86,7 @@ if (ftms_read) {
     });
 
     let discovered = false;
-    noble.on('discover', async (peripheral) => {
+    noble.on('discover', async (peripheral: Peripheral) => {
         console.log(`Discovered: ${peripheral.advertisement.localName}`);
         if (!discovered && peripheral.advertisement.localName && peripheral.advertisement.localName.includes("HORIZON")) {
             discovered = true;
