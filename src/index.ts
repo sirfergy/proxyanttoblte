@@ -104,10 +104,10 @@ if (ftms_read) {
                 const flags = data.readUInt16LE();
 
                 if ((flags & ftmsFlags.moreData) !== ftmsFlags.moreData) {
-                    const speed = data.readUInt16LE(2);
-                    console.log(`Instantaneous speed: ${speed}`);
+                    const speedInDekametersPerHour = data.readUInt16LE(2);
+                    console.log(`Instantaneous speed: ${speedInDekametersPerHour}`);
 
-                    speedMetersPerSecond = speed / 100.0;
+                    speedMetersPerSecond = speedInDekametersPerHour * 10 / 3600;
 
                     rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
 
