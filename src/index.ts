@@ -74,6 +74,7 @@ if (ftms_read) {
     };
 
     noble.on('stateChange', (state) => {
+        console.log(`State change: ${state}`);
         if (state == "poweredOn") {
             noble.startScanning(["1826"], true, (error) => {
                 if (error) {
@@ -85,6 +86,7 @@ if (ftms_read) {
 
     let discovered = false;
     noble.on('discover', async (peripheral) => {
+        console.log(`Discovered: ${peripheral.advertisement.localName}`);
         if (!discovered && peripheral.advertisement.localName && peripheral.advertisement.localName.includes("HORIZON")) {
             discovered = true;
 
@@ -139,7 +141,7 @@ if (ftms_read) {
 
 process.on('SIGINT', () => {
     console.log('Caught interrupt signal (Ctrl+C)');
-    stick.close();
+    stick && stick.close();
     // Perform any cleanup or shutdown tasks here
     process.exit();
 });
