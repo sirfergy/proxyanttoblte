@@ -107,7 +107,7 @@ if (ftms_read) {
                     const speed = data.readUInt16LE(2);
                     console.log(`Instantaneous speed: ${speed}`);
 
-                    speedMetersPerSecond = speed;
+                    speedMetersPerSecond = speed / 100.0;
 
                     rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
 
