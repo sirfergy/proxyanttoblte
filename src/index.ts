@@ -30,7 +30,7 @@ if (ble) {
     });
 }
 
-const ant_read = true;
+const ant_read = false;
 let stick: GarminStick2;
 if (ant_read) {
     stick = new GarminStick2();
