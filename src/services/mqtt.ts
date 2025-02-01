@@ -1,5 +1,7 @@
 import { MqttClient, connect } from "mqtt";
 import os from "os";
+import Debug from "debug";
+const debug = Debug("mqtt");
 
 const topic = "activity/rsc";
 
@@ -20,12 +22,12 @@ export class MqttService {
         });
 
         this.client.on("error", (err) => {
-            console.log("Error: ", err);
+            debug("Error: ", err);
             this.client.end();
         });
 
         this.client.on("connect", () => {
-            console.log("Client connected to broker");
+            debug("Client connected to broker");
         });
     }
 
@@ -38,7 +40,7 @@ export class MqttService {
             const message = JSON.stringify({ speedMetersPerSecond, cadenceStepsPerMinute });
             this.client.publish(topic, message, (err) => {
                 if (err) {
-                    console.log("Error publishing message: ", err);
+                    debug("Error publishing message: ", err);
                 }
             });
         }
@@ -52,7 +54,7 @@ export class MqttService {
                     callback(speedMetersPerSecond, cadenceStepsPerMinute);
                 });
             } else {
-                console.log(`Error subscribing to topic: ${topic}`);
+                debug(`Error subscribing to topic: ${topic}`);
             }
         });
     }
