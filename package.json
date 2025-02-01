@@ -27,7 +27,8 @@
   "dependencies": {
     "@abandonware/bleno": "abandonware/bleno",
     "@abandonware/noble": "^1.9.2-25",
-    "ant-plus-next": "sirfergy/ant-plus-next"
+    "ant-plus-next": "sirfergy/ant-plus-next",
+    "ble-host": "^1.0.3"
   },
   "devDependencies": {
     "@types/bleno": "^0.4.6",
