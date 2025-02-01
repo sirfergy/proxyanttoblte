@@ -25,6 +25,7 @@ export class FtmsService {
     constructor() {
         noble.on('stateChange', (state) => {
             debug(`State change: ${state}`);
+
             if (state == "poweredOn") {
                 noble.startScanning(["1826"], true, (error) => {
                     if (error) {
@@ -32,10 +33,14 @@ export class FtmsService {
                     }
                 });
             }
+            else if (state == "poweredOff") {
+                noble.stopScanning();
+            }
         });
 
         noble.on('discover', async (peripheral) => {
             debug(`Discovered: ${peripheral.advertisement.localName}`);
+
             if (!this.discovered && peripheral.advertisement.localName && peripheral.advertisement.localName.includes("HORIZON")) {
                 this.discovered = true;
 
@@ -48,6 +53,11 @@ export class FtmsService {
                 const treadmill = ftms.characteristics.find(c => c.uuid.toLowerCase() == "2acd")!;
 
                 await treadmill.subscribeAsync();
+
+                peripheral.on('disconnect', () => {
+                    debug("Disconnected");
+                    this.discovered = false;
+                });
 
                 treadmill.on('data', (data, isNotification) => {
                     const flags = data.readUInt16LE();
@@ -64,25 +74,25 @@ export class FtmsService {
                     }
 
                     const averageSpeed = data.readUInt16LE(2);
-                    console.log(`Average speed: ${averageSpeed}`);
+                    debug(`Average speed: ${averageSpeed}`);
 
                     const totalDistance = data.readUIntLE(4, 3);
-                    console.log(`Total distance: ${totalDistance}`);
+                    debug(`Total distance: ${totalDistance}`);
 
                     const inclination = data.readInt16LE(7);
                     const rampAngleSetting = data.readInt16LE(9);
-                    console.log(`Inclination: ${inclination} - ${rampAngleSetting}`);
+                    debug(`Inclination: ${inclination} - ${rampAngleSetting}`);
 
                     const totalEnergy = data.readUInt16LE(11);
                     const energyPerHour = data.readUInt16LE(13); // actually total energy
                     const energyPerMinute = data.readUIntLE(15, 1);
-                    console.log(`Expended energy: ${totalEnergy} - ${energyPerHour} - ${energyPerMinute}`);
+                    debug(`Expended energy: ${totalEnergy} - ${energyPerHour} - ${energyPerMinute}`);
 
                     const heartRate = data.readUIntLE(16, 1);
-                    console.log(`Heart rate: ${heartRate}`);
+                    debug(`Heart rate: ${heartRate}`);
 
                     const elapsedTime = data.readUInt16LE(17);
-                    console.log(`Elapsed time: ${elapsedTime}`);
+                    debug(`Elapsed time: ${elapsedTime}`);
                 });
             }
         });
