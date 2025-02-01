@@ -5,6 +5,7 @@ import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
 import commandLineArgs from "command-line-args";
 import mqtt, { MqttClient, connect } from "mqtt";
+import os from "os";
 
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
@@ -18,13 +19,13 @@ const optionDefinitions = [
 const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean, mqtt: Boolean };
 
 let client: MqttClient;
-const topic = "rsc";
+const topic = "activity/rsc";
 const brokerUrl = `mqtt://127.0.0.1:1883`;
 
 function connectToBroker() {
     client = connect(brokerUrl, {
         keepalive: 60,
-        clientId: "publisherId",
+        clientId: `${os.hostname}-rsc`,
         protocolId: 'MQTT',
         protocolVersion: 5,
         clean: true,
@@ -53,6 +54,22 @@ function publishRscMessage() {
     }
 }
 
+function subscribeToTopic() {
+    client.subscribe(topic, (err) => {
+        if (!err) {
+            // Subscribe to the topic
+            client.on("message", (topic, message) => {
+                //  Message is of type Buffer and needs to be converted into a string
+                console.log(
+                    `Received message: ${message.toString()} from topic: ${topic}`
+                );
+            });
+        } else {
+            console.log(`Error subscribing to topic: ${topic}`);
+        }
+    });
+}
+
 if (mqtt) {
     connectToBroker();
 }
@@ -77,6 +94,8 @@ if (rsc) {
             ]);
         }
     });
+
+    subscribeToTopic();
 }
 
 let stick: GarminStick2;
@@ -192,6 +211,7 @@ if (ftms) {
 process.on('SIGINT', () => {
     console.log('Caught interrupt signal (Ctrl+C)');
     stick && stick.close();
+    client && client.end();
     // Perform any cleanup or shutdown tasks here
     process.exit();
 });
