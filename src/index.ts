@@ -5,6 +5,8 @@ import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
 import commandLineArgs from "command-line-args";
 
+console.log(`Multi: ${process.env.NOBLE_MULTI_ROLE}`);
+
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
 
