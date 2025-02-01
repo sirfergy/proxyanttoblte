@@ -59,10 +59,8 @@ function subscribeToTopic() {
         if (!err) {
             // Subscribe to the topic
             client.on("message", (topic, message) => {
-                //  Message is of type Buffer and needs to be converted into a string
-                console.log(
-                    `Received message: ${message.toString()} from topic: ${topic}`
-                );
+                const { speedMetersPerSecond, cadenceStepsPerMinute } = JSON.parse(message.toString());
+                rscService && rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
             });
         } else {
             console.log(`Error subscribing to topic: ${topic}`);

@@ -137,7 +137,7 @@ export class RSCService extends bleno.PrimaryService {
     }
 
     notify(speedMetersPerSecond: number, cadenceStepsPerMinute: number, strideLengthInMeters: number, totalDistanceInKilometers: number) {
-        console.log("Notified!");
+        console.log(`Notified: speed=${speedMetersPerSecond}, cadence=${cadenceStepsPerMinute}, stride=${strideLengthInMeters}, distance=${totalDistanceInKilometers}`);
         this.measurement.sendMeasurement(speedMetersPerSecond, cadenceStepsPerMinute, strideLengthInMeters, totalDistanceInKilometers);
     }
 }
