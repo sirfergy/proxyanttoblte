@@ -7,7 +7,7 @@ import { DeviceInformationService } from "./services/dis.js";
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
 
-const ble = false;
+const ble = true;
 const rscService = new RSCService();
 if (ble) {
     bleno.on('stateChange', (state) => {
@@ -30,7 +30,7 @@ if (ble) {
     });
 }
 
-const ant_read = false;
+const ant_read = true;
 let stick: GarminStick2;
 if (ant_read) {
     stick = new GarminStick2();
