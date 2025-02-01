@@ -34,6 +34,7 @@
   "devDependencies": {
     "@types/bleno": "^0.4.6",
     "@types/command-line-args": "^5.2.3",
+    "@types/debug": "^4.1.12",
     "@types/mqtt": "^0.0.34",
     "@types/noble": "^0.0.44",
     "@types/node": "^22.12.0",

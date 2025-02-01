@@ -1,4 +1,6 @@
 import bleno from "@abandonware/bleno";
+import Debug from "debug";
+const debug = Debug("rsc");
 
 const RSC_SERVICE_UUID = '1814';
 const RSC_FEATURE_CHARACTERISTIC_UUID = '2A54';
@@ -6,7 +8,6 @@ const RSC_MEASUREMENT_CHARACTERISTIC_UUID = '2A53';
 const SENSOR_LOCATION_CHARACTERISTIC_UUID = '2A5D';
 const SC_CONTROL_POINT_CHARACTERISTIC_UUID = '2902';
 
-// RSC Feature Characteristic
 class RSCFeatureCharacteristic extends bleno.Characteristic {
     constructor() {
         super({
@@ -14,11 +15,11 @@ class RSCFeatureCharacteristic extends bleno.Characteristic {
             properties: ['read'],
             value: null
         });
-        this.value = Buffer.from([0x07, 0x00]); // Mock: supports instantaneous stride length, total distance, and walking or running status
+        this.value = Buffer.from([0x07, 0x00]); // 0x07 = Instantaneous Stride Length, Instantaneous Cadence, Total Distance
     }
 
     onReadRequest(offset: number, callback: (offset: number, callback?: Buffer) => void) {
-        console.log('RSCFeatureCharacteristic - onReadRequest');
+        debug('RSCFeatureCharacteristic - onReadRequest');
         callback(this.RESULT_SUCCESS, this.value ?? undefined);
     }
 }
@@ -43,20 +44,19 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
     }
 
     onSubscribe(maxValueSize: number, updateValueCallback: UpdateValueCallback) {
-        console.log('RSC Measurement subscribed');
+        debug('RSC Measurement subscribed');
         this._updateValueCallback = updateValueCallback;
-        // this.sendMeasurement();
     }
 
     onUnsubscribe() {
-        console.log('RSC Measurement unsubscribed');
+        debug('RSC Measurement unsubscribed');
         this._updateValueCallback = null;
     }
 
     sendMeasurement(speedMetersPerSecond: number, cadenceStepsPerMinute: number, strideLengthInMeters: number, totalDistanceInKilometers: number) {
-        console.log("Sending measurement");
+        debug(`Sending measurement ${speedMetersPerSecond} m/s, ${cadenceStepsPerMinute} steps/min, ${strideLengthInMeters} m, ${totalDistanceInKilometers} km`);
+
         if (this._updateValueCallback) {
-            // Example RSC measurement data
             const buffer = Buffer.alloc(10);
 
             let flags = 0;
@@ -70,22 +70,14 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
             buffer.writeUInt16LE(strideLengthInMeters * 100, 4); // Instantaneous Stride Length
             buffer.writeUInt32LE(totalDistanceInKilometers * 1000, 6); // Total Distance
 
-            //buffer.writeUInt16LE(150, 1); // Instantaneous Speed (1.5 m/s)
-            //buffer.writeUInt8(60, 3); // Instantaneous Cadence (60 steps/min)
-            //buffer.writeUInt16LE(100, 4); // Instantaneous Stride Length (1.0 m)
-            //buffer.writeUInt32LE(5000, 6); // Total Distance (5.0 km)
-
             this._updateValueCallback(buffer);
         }
-
-        // Send measurement every second
-        // setTimeout(this.sendMeasurement.bind(this), 1000);
     }
 }
 
 class SensorLocationCharacteristic extends bleno.Characteristic {
     constructor() {
-        const sensorLocation = 13; // Example: 13 for top of the shoe
+        const sensorLocation = 13; // 13 for top of the shoe
         super({
             uuid: SENSOR_LOCATION_CHARACTERISTIC_UUID,
             properties: ['read'],
@@ -95,7 +87,7 @@ class SensorLocationCharacteristic extends bleno.Characteristic {
     }
 
     onReadRequest(offset: number, callback: (offset: number, callback?: Buffer) => void) {
-        console.log('SensorLocationCharacteristic - onReadRequest');
+        debug('SensorLocationCharacteristic - onReadRequest');
         callback(this.RESULT_SUCCESS, this.value ?? undefined);
     }
 }
@@ -137,7 +129,6 @@ export class RSCService extends bleno.PrimaryService {
     }
 
     notify(speedMetersPerSecond: number, cadenceStepsPerMinute: number, strideLengthInMeters: number, totalDistanceInKilometers: number) {
-        console.log(`Notified: speed=${speedMetersPerSecond}, cadence=${cadenceStepsPerMinute}, stride=${strideLengthInMeters}, distance=${totalDistanceInKilometers}`);
         this.measurement.sendMeasurement(speedMetersPerSecond, cadenceStepsPerMinute, strideLengthInMeters, totalDistanceInKilometers);
     }
 }
