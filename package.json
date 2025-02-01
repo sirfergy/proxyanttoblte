@@ -26,9 +26,8 @@
   "homepage": "https://github.com/sirfergy/proxyanttoblte#readme",
   "dependencies": {
     "@abandonware/bleno": "abandonware/bleno",
-    "@abandonware/noble": "^1.9.2-25",
-    "ant-plus-next": "sirfergy/ant-plus-next",
-    "ble-host": "^1.0.3"
+    "@abandonware/noble": "sirfergy/noble",
+    "ant-plus-next": "sirfergy/ant-plus-next"
   },
   "devDependencies": {
     "@types/bleno": "^0.4.6",
