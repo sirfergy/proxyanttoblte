@@ -4,7 +4,7 @@ import noble from "@abandonware/noble";
 import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
 import commandLineArgs from "command-line-args";
-import mqtt, { MqttClient, connect } from "mqtt";
+import { MqttClient, connect } from "mqtt";
 import os from "os";
 
 let speedMetersPerSecond = 0;
@@ -14,13 +14,15 @@ const optionDefinitions = [
     { name: 'rsc', type: Boolean },
     { name: 'ant', type: Boolean },
     { name: 'ftms', type: Boolean },
-    { name: 'mqtt', type: Boolean },
+    { name: 'publish', type: Boolean },
+    { name: 'subscribe', type: Boolean },
+    { name: 'broker', type: String },
 ];
-const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean, mqtt: Boolean };
+const { rsc, ant, ftms, publish, subscribe, broker } = commandLineArgs(optionDefinitions, { camelCase: true }) as { rsc: boolean, ant: boolean, ftms: boolean, publish: boolean, subscribe: boolean, broker: string };
 
 let client: MqttClient;
 const topic = "activity/rsc";
-const brokerUrl = `mqtt://127.0.0.1:1883`;
+const brokerUrl = broker ?? `mqtt://127.0.0.1:1883`;
 
 function connectToBroker() {
     client = connect(brokerUrl, {
@@ -68,7 +70,7 @@ function subscribeToTopic() {
     });
 }
 
-if (mqtt) {
+if (publish || subscribe) {
     connectToBroker();
 }
 
@@ -93,7 +95,9 @@ if (rsc) {
         }
     });
 
-    subscribeToTopic();
+    if (subscribe) {
+        subscribeToTopic();
+    }
 }
 
 let stick: GarminStick2;
