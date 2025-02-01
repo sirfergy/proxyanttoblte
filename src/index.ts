@@ -3,13 +3,20 @@ import bleno from "@abandonware/bleno";
 import noble from "@abandonware/noble";
 import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
+import commandLineArgs from "command-line-args";
 
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
 
-const ble = true;
+const optionDefinitions = [
+    { name: 'rsc', type: Boolean },
+    { name: 'ant', type: Boolean },
+    { name: 'ftms', type: Boolean },
+];
+const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean };
+
 const rscService = new RSCService();
-if (ble) {
+if (rsc) {
     bleno.on('stateChange', (state) => {
         console.log("State change " + state);
         if (state === 'poweredOn') {
@@ -30,9 +37,8 @@ if (ble) {
     });
 }
 
-const ant_read = true;
 let stick: GarminStick2;
-if (ant_read) {
+if (ant) {
     stick = new GarminStick2();
 
     const running = new StrideSpeedDistanceSensor(stick);
@@ -55,8 +61,7 @@ if (ant_read) {
     console.log('Stick open result:', result);
 }
 
-const ftms_read = true;
-if (ftms_read) {
+if (ftms) {
     const ftmsFlags = {
         moreData: 1,
         averageSpeed: 1 << 1,
