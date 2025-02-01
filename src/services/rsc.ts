@@ -65,7 +65,7 @@ class RSCMeasurementCharacteristic extends bleno.Characteristic {
 
             buffer.writeUInt8(flags, 0);
 
-            buffer.writeUInt16LE(speedMetersPerSecond * 100, 1); // Instantaneous Speed
+            buffer.writeUInt16LE(speedMetersPerSecond * 256, 1); // Instantaneous Speed Unit is in m/s with a resolution of 1/256 s
             buffer.writeUInt8(cadenceStepsPerMinute, 3); // Instantaneous Cadence 
             buffer.writeUInt16LE(strideLengthInMeters * 100, 4); // Instantaneous Stride Length
             buffer.writeUInt32LE(totalDistanceInKilometers * 1000, 6); // Total Distance
