@@ -4,7 +4,7 @@ import noble from "@abandonware/noble";
 import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
 import commandLineArgs from "command-line-args";
-import { MqttClient, connect } from "mqtt";
+import mqtt, { MqttClient, connect } from "mqtt";
 
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
@@ -13,8 +13,9 @@ const optionDefinitions = [
     { name: 'rsc', type: Boolean },
     { name: 'ant', type: Boolean },
     { name: 'ftms', type: Boolean },
+    { name: 'mqtt', type: Boolean },
 ];
-const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean };
+const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean, mqtt: Boolean };
 
 let client: MqttClient;
 const topic = "rsc";
@@ -42,12 +43,18 @@ function connectToBroker() {
 }
 
 function publishRscMessage() {
-    const message = JSON.stringify({ speedMetersPerSecond, cadenceStepsPerMinute });
-    client.publish(topic, message, (err) => {
-        if (err) {
-            console.log("Error publishing message: ", err);
-        }
-    });
+    if (client && client.connected) {
+        const message = JSON.stringify({ speedMetersPerSecond, cadenceStepsPerMinute });
+        client.publish(topic, message, (err) => {
+            if (err) {
+                console.log("Error publishing message: ", err);
+            }
+        });
+    }
+}
+
+if (mqtt) {
+    connectToBroker();
 }
 
 const rscService = new RSCService();
