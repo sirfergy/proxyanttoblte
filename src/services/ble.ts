@@ -1,7 +1,7 @@
 import bleno from "@abandonware/bleno";
 import Debug from "debug";
-import { RSCService } from "./rsc";
-import { DeviceInformationService } from "./dis";
+import { RSCService } from "./rsc.js";
+import { DeviceInformationService } from "./dis.js";
 const debug = Debug("ble");
 
 export class BleService {
