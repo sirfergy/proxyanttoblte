@@ -4,8 +4,7 @@ import noble from "@abandonware/noble";
 import { RSCService } from "./services/rsc.js";
 import { DeviceInformationService } from "./services/dis.js";
 import commandLineArgs from "command-line-args";
-
-console.log(`Multi: ${process.env.NOBLE_MULTI_ROLE}`);
+import { MqttClient, connect } from "mqtt";
 
 let speedMetersPerSecond = 0;
 let cadenceStepsPerMinute = 0;
@@ -16,6 +15,40 @@ const optionDefinitions = [
     { name: 'ftms', type: Boolean },
 ];
 const { rsc, ant, ftms } = commandLineArgs(optionDefinitions) as { rsc: boolean, ant: boolean, ftms: boolean };
+
+let client: MqttClient;
+const topic = "rsc";
+const brokerUrl = `mqtt://127.0.0.1:1883`;
+
+function connectToBroker() {
+    client = connect(brokerUrl, {
+        keepalive: 60,
+        clientId: "publisherId",
+        protocolId: 'MQTT',
+        protocolVersion: 5,
+        clean: true,
+        reconnectPeriod: 1000,
+        connectTimeout: 30 * 1000,
+    });
+
+    client.on("error", (err) => {
+        console.log("Error: ", err);
+        client.end();
+    });
+
+    client.on("connect", () => {
+        console.log("Client connected to broker");
+    });
+}
+
+function publishRscMessage() {
+    const message = JSON.stringify({ speedMetersPerSecond, cadenceStepsPerMinute });
+    client.publish(topic, message, (err) => {
+        if (err) {
+            console.log("Error publishing message: ", err);
+        }
+    });
+}
 
 const rscService = new RSCService();
 if (rsc) {
@@ -52,7 +85,9 @@ if (ant) {
         //const speedMetersPerSecond = Number(`${SpeedInteger}.${SpeedFractional}`);
         cadenceStepsPerMinute = Number(`${CadenceInteger}.${CadenceFractional}`);
 
-        rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
+
+        publishRscMessage();
+        // rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
     });
 
     stick.on('startup', () => {
@@ -116,7 +151,8 @@ if (ftms) {
 
                     speedMetersPerSecond = speedInDekametersPerHour * 10 / 3600;
 
-                    rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
+                    publishRscMessage();
+                    // rscService.notify(speedMetersPerSecond, cadenceStepsPerMinute, 0, 0);
 
                     return;
                 }
